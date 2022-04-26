@@ -131,8 +131,10 @@ const onImageNext = function (event) {
     let nextParent = imageParent.nextElementSibling;
 
     // 3. sprawdzić czy ten element istnieje - jeśli nie to [.nextElementSibling] zwróci [null]
-    if (!nextParent) {
-        nextParent = null;
+    if (!nextParent) {  // Go to first
+        const firstParent = this.querySelector('.js-slider__thumbs figure');
+        const startPoint = firstParent.nextElementSibling;
+        nextParent = startPoint;
     }
 
     // 4. przełączyć klasę [.js-slider__thumbs-image--current] do odpowiedniego elementu
@@ -159,9 +161,15 @@ const onImagePrev = function (event) {
     const imageParent = currentImage.parentElement;
     let previousParent = imageParent.previousElementSibling;
 
+    if (previousParent.classList.contains('js-slider__thumbs-item--prototype')) {  // Go to last
+
+        const sliderThumbs = this.querySelector('.js-slider__thumbs');
+        const endPoint = sliderThumbs.lastChild;
+        previousParent = endPoint;
+    }
 
     // 3. sprawdzić czy ten element istnieje i czy nie posiada klasy [.js-slider__thumbs-item--prototype]
-    if (previousParent && !previousParent.classList.contains('js-slider__thumbs-item--prototype')) {
+    if (previousParent) {
 
         // 4. przełączyć klasę [.js-slider__thumbs-image--current] do odpowiedniego elementu
         const previousImage = previousParent.querySelector('img');
@@ -173,6 +181,7 @@ const onImagePrev = function (event) {
         const sliderImageURL = this.querySelector('.js-slider__image');
         sliderImageURL.setAttribute('src', imageURL);
     }
+
 }
 
 const onClose = function (event) {
