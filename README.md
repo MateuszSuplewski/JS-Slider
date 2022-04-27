@@ -1,114 +1,111 @@
-> ⭐ ***README** to coś więcej niż opis. Poprzez nie **pokazujesz swoje mocne strony** – swoją dokładność, sposób myślenia i podejście do rozwiązywania problemów. Niech Twoje README pokaże, że masz **świetne predyspozycje do rozwoju!***
-> 
-> 🎁 *Zacznij od razu. Skorzystaj z **[szablonu README i wskazówek](https://github.com/devmentor-pl/readme-template)**.* 
-
-&nbsp;
-
-
-
-# JavaScript: Zdarzenia
-
-W tym projekcie zmierzysz się z kodem napisanym przez **innego programistę**.
-
-Otrzymałeś zadanie, aby utworzyć pokaz slajdów (galerię), który będzie uruchamiany po kliknięciu w wybrane zdjęcie (element `<figure>`, który zawiera element `<img>`). 
-
-Klient ma już gotową część kodu HTML, CSS oraz JS.
-Prosi Cię, abyś HTML-a i CSS-a nie zmieniał, a w JavaScripcie trzymał się istniejącej już konwencji.
-
-Element (obraz), w który będziemy klikać, wygląda następująco:
-
-```html
-<figure class="gallery__item gallery__item--pos1">
-    <img src="./assets/img/1.jpg" alt="1" class="gallery__image">
-    <figcaption class="gallery__caption">źródło: unsplash.com</figcaption>
-</figure>
-```
-
-Natomiast kod HTML do pokazu slajdów prezentuje się w ten sposób:
-
-```html
-<section class="js-slider">
-    <header class="js-slider__zoom">
-        <span class="js-slider__nav js-slider__nav--prev">&lt;</span>
-        <span class="js-slider__nav js-slider__nav--next">&gt;</span>
-        <figure class="js-slider__wrapper">
-            <img class="js-slider__image" src="./assets/img/6.jpg" alt="1">
-            <figcaption class="js-slider__caption">źródło: unsplash.com</figcaption>
-        </figure>
-    </header>
-    <footer class="js-slider__thumbs">
-        <figure class="js-slider__thumbs-item js-slider__thumbs-item--prototype">
-            <img class="js-slider__thumbs-image">
-        </figure>
-    </footer>
-</section>
-```
-
-* **.js-slider__zoom** – ma zawierać aktualnie prezentowane zdjęcie
-* **.js-slider__thumbs** – ma zawierać listę zdjęć o tej samej nazwie grupy co kliknięte zdjęcie
-
-> Nazwa grupy jest przechowywana w atrybucie `data-slider-group-name` i jest generowana automatycznie przez JS, aby zasymulować zmieniający się kod HTML. 
-
-Efekt po kliknięciu w któryś z obrazów na stronie powinien wyglądać jak na poniższym screenie:
 
 ![](./assets/img/img1.png)
 
+# Slider
+
+See the live version of [Slider App](https://mateuszsuplewski.github.io/JS-Slider/).
+
+Slider is an application that allows you to open a gallery of images and scroll through the photos using the buttons attached to the slider. 
+Provided application uses Custom Events to handle the occurring events.
+
+**Main features**:
+- Display gallery on image click,
+- Scroll through the photos using buttons,
+- Infinite scrolling,
+- Automatic gallery scrolling.
+
 &nbsp;
+ 
+## 💡 Technologies
+![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/css3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)
 
-> **Uwaga!** Celem tego projektu jest odnalezienie się w cudzym kodzie i wykonanie powierzonego zadania. Pamiętaj, że nad projektem zazwyczaj pracuje kilka osób z różnym doświadczeniem (junior, regular, senior, a nawet lead czy architekt). To powoduje, że miejscami kod może być bardziej skomplikowany. W tym projekcie nie chodzi więc o to, abyś był w stanie taki kod napisać samodzielnie. W tej chwili masz go na tyle rozumieć, aby wykonać swoją część pracy.
 
 &nbsp;
+ 
+## 🤔 Solutions provided in the project
 
-## Implementacja
-
-Nasze rozwiązanie ma się opierać w głównej mierze na własnych eventach (CustomEvent), których nazwy są następujące:
-
-* **js-slider-img-click** – event, który jest uruchamiany po kliknięciu w obrazek na stronie (jest to już zrobione w pliku `script.js`) i ma wyświetlić nasz pokaz slajdów
-
-* **js-slider-img-next** – event, który jest uruchamiany po kliknięciu w prawą strzałkę na stronie i ma pokazać kolejny obrazek (o ile w ogóle istnieje) spośród tych widocznych w miniaturach
-
-* **js-slider-img-prev** – podobnie jak wyżej, tylko chodzi o lewą strzałkę
-
-* **js-slider-close** – event, który jest uruchamiany po kliknięciu w wolną przestrzeń wokół prezentowanego zdjęcia, czyli w element `.js-slider__zoom` (i tylko w ten element! Trzeba uważać na propagację eventów).
-
-Do uruchomienia eventów będziemy używać napisanej już funkcji `fireCustomEvent`:
-
+- ### Functionality and interaction
+- - #### Listening for an event
 ```javascript
-const fireCustomEvent = function(element, name) {
-    console.log(element.className, '=>', name);
-
-    const event = new CustomEvent(name, {
-        bubbles: true,
+ const navNext = sliderRootElement.querySelector('.js-slider__nav--next');
+    navNext.addEventListener('click', function (e) {
+        fireCustomEvent(e.target, 'js-slider-img-next');
     });
+     sliderRootElement.addEventListener('js-slider-img-next', onImageNext);
+```
+- - #### Function used with event
+```javascript
+const onImageNext = function (event) {
+    const currentImage = this.querySelector('.js-slider__thumbs-image--current');
+    
+    const imageParent = currentImage.parentElement;
+    let nextParent = imageParent.nextElementSibling;
 
-    element.dispatchEvent( event );
+    const nextImage = nextParent.querySelector('img');
+    currentImage.classList.remove('js-slider__thumbs-image--current');
+    nextImage.classList.toggle('js-slider__thumbs-image--current');
+
+    const imageURL = nextImage.getAttribute('src');
+    const sliderImageURL = this.querySelector('.js-slider__image');
+    sliderImageURL.setAttribute('src', imageURL);
 }
 ```
-
-Dla ułatwienia funkcja ta posiada `console.log()`, który prezentuje nam informację o tym, jaki event jest odpalany i na jakim elemencie.
-
-Zauważ, że funkcja ta przyjmuje dwa parametry: pierwszy to element, na którym ma być wywołany event, a drugi to nazwa eventu.
-
-> Zapoznaj się dokładnie ze strukturą plików HTML i CSS oraz opisem działań w pliku `./assets/js/script.js` – wszystko to pomoże Ci w zrealizowaniu projektu.
-
-> *Dlaczego w tym projekcie stosujemy Custom Events?* – często otrzymuję takie pytanie, dlatego tutaj na nie odpowiem: przede wszystkim po to, by oswoić się ze sposobem ich działania. Projekt oczywiście mógłby opierać się na zdarzeniach dostępnych w JavaScripcie i działałby tak samo, lecz tutaj kod tworzył inny programista, który miał własny zamysł. Możliwe, że przygotował grunt pod dalszy rozwój projektu. Custom Events zwiększają bowiem elastyczność rozwiązania: umożliwiają [przekazywanie dodatkowych danych](http://kursjs.pl/kurs/events/events-tematy-dodatkowe#customevent) (dzięki właściwości `.details`) oraz [komunikację między elementami](http://kursjs.pl/kurs/events/events-tematy-dodatkowe#po-co) (dzięki propagacji).
+* ### Looping photo scrolling
+- - #### Find the first image (not a prototype) when the next one doesn't exist
+```javascript
+if (!nextParent) {  // Go to first
+        const firstParent = this.querySelector('.js-slider__thumbs figure');
+        const startPoint = firstParent.nextElementSibling;
+        nextParent = startPoint;
+    }
+```
+ - - #### Find the last image (not a prototype) when there is no previous one
+```javascript
+if (previousParent.classList.contains('js-slider__thumbs-item--prototype')) {  // Go to last
+        const sliderThumbs = this.querySelector('.js-slider__thumbs');
+        const endPoint = sliderThumbs.lastChild;
+        previousParent = endPoint;
+    }
+```
+- ### Self-starting scrolling
+- - #### Next image every 3 seconds
+```javascript
+ const boundAutoSlide = onImageNext.bind(sliderRootElement);
+            autoSlideNext = setInterval(boundAutoSlide, 3000);
+```
+Using bind to change context of `this` in `onImageNext()` to `sliderRootElement`
+- - #### Break automatic scroll 
+ ```javascript
+ clearInterval(autoSlideNext)
+ ```
+- ### Worth mentioning
+  App includes a functionality to randomly allocate one of two classes to each of the photos
 
 &nbsp;
 
-## Zadania dodatkowe
-
-### Zadanie 1
-
-Napisz kod, który pozwoli przełączać obrazki w nieskończoność – jeśli nie ma już następnego obrazka (lub poprzedniego), to po kliknięciu strzałki nawigacji wracamy do początku (lub końca) galerii.
-
-### Zadanie 2
-
-Stwórz kod, który automatycznie, co zadaną ilość czasu, sam przełącza obrazki.
+## 💭 Conclusions for future projects
 
 
+### This is the issue
+I used `if(event.target.getAttribute('class') === 'js-slider__zoom')` in `onClose`. Instead of that I could've used `event.stopPropagation()` to `onImagePrev` and `onImagePrev`.
+
+In this app I will leave the first solution, because I don't have that many events, but I will make sure to implement it in the other programs!
+
+
+### Ideas to upgrade project in the Future
+Add function that generate photos template in random order from larger image pool .
 
 &nbsp;
 
-> ⭐ ***README** to coś więcej niż opis. Poprzez nie **pokazujesz swoje mocne strony** – swoją dokładność, sposób myślenia i podejście do rozwiązywania problemów. Niech Twoje README pokaże, że masz **świetne predyspozycje do rozwoju!***
-> 
-> 🎁 *Zacznij od razu. Skorzystaj z **[szablonu README i wskazówek](https://github.com/devmentor-pl/readme-template)**.* 
+## 🙋‍♂️ Feel free to contact me
+In case you found more issues that could've been solved, you have ideas how we can create something more complex or just simply want to chat, then just let me know on:
+[Linkedin](https://www.linkedin.com/in/mateusz-suplewski-705017227/) or via Email : Matx3582@gmail.com
+&nbsp;
+
+## 👏 Credits
+Thanks to my [Mentor - devmentor.pl](https://devmentor.pl/) & [Akademia Samouka](https://akademiasamouka.pl/) - for providing me with this task.
+
+
+&nbsp;
