@@ -7,6 +7,8 @@ const init = function () {
     runJSSlider();
 }
 
+let autoSlideNext;
+
 document.addEventListener('DOMContentLoaded', init);
 
 const runJSSlider = function () {
@@ -24,6 +26,7 @@ const initEvents = function (imagesList, sliderRootElement) {
     imagesList.forEach(function (item) {
         item.addEventListener('click', function (e) {
             fireCustomEvent(e.currentTarget, 'js-slider-img-click');
+            fireCustomEvent(sliderRootElement, 'js-auto-slide');
         });
 
     });
@@ -34,6 +37,7 @@ const initEvents = function (imagesList, sliderRootElement) {
     const navNext = sliderRootElement.querySelector('.js-slider__nav--next');
     navNext.addEventListener('click', function (e) {
         fireCustomEvent(e.target, 'js-slider-img-next');
+        clearInterval(autoSlideNext);
     });
 
 
@@ -43,6 +47,7 @@ const initEvents = function (imagesList, sliderRootElement) {
     const navPrev = sliderRootElement.querySelector('.js-slider__nav--prev');
     navPrev.addEventListener('click', function (e) {
         fireCustomEvent(e.target, 'js-slider-img-prev');
+        clearInterval(autoSlideNext);
     });
 
 
@@ -53,6 +58,7 @@ const initEvents = function (imagesList, sliderRootElement) {
     const zoom = sliderRootElement.querySelector('.js-slider__zoom');
     zoom.addEventListener('click', function (e) {
         fireCustomEvent(e.target, 'js-slider-close');
+        clearInterval(autoSlideNext);
     });
 }
 
@@ -76,16 +82,22 @@ const initCustomEvents = function (imagesList, sliderRootElement, imagesSelector
     sliderRootElement.addEventListener('js-slider-img-next', onImageNext);
     sliderRootElement.addEventListener('js-slider-img-prev', onImagePrev);
     sliderRootElement.addEventListener('js-slider-close', onClose);
+    sliderRootElement.addEventListener('js-auto-slide', function () {
+        const boundAutoSlide = onImageNext.bind(sliderRootElement);
+        autoSlideNext = setInterval(boundAutoSlide, 3000);
+    });
 }
 
-const onImageClick = function (event, sliderRootElement, imagesSelector) {
 
+
+
+const onImageClick = function (event, sliderRootElement, imagesSelector) {
     // todo:  
     // 1. dodać klasę [.js-slider--active], aby pokazać całą sekcję
     sliderRootElement.classList.add('js-slider--active');
 
     // 2. wyszukać ściężkę (atrybut [src]) do klikniętego elementu i wstawić do [.js-slider__image]
-    const clickedImage = event.target.querySelector('img');
+    const clickedImage = event.target.querySelector('img'); // spróbować tu dać this zamiast wyszukiwac selektorem !!!
     const imageURL = clickedImage.getAttribute('src');
     const sliderImage = sliderRootElement.querySelector('.js-slider__image');
     sliderImage.setAttribute('src', imageURL);
@@ -122,7 +134,6 @@ const onImageNext = function (event) {
     // [this] wskazuje na element [.js-slider]
 
     // todo:
-
     // 1. wyszukać aktualny wyświetlany element przy pomocy [.js-slider__thumbs-image--current]
     const currentImage = this.querySelector('.js-slider__thumbs-image--current');
 
@@ -153,7 +164,6 @@ const onImagePrev = function (event) {
     // [this] wskazuje na element [.js-slider]
 
     // todo:
-
     // 1. wyszukać aktualny wyświetlany element przy pomocy [.js-slider__thumbs-image--current]
     const currentImage = this.querySelector('.js-slider__thumbs-image--current');
 
@@ -181,7 +191,6 @@ const onImagePrev = function (event) {
         const sliderImageURL = this.querySelector('.js-slider__image');
         sliderImageURL.setAttribute('src', imageURL);
     }
-
 }
 
 const onClose = function (event) {
