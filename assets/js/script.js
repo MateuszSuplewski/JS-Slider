@@ -14,7 +14,6 @@ document.addEventListener('DOMContentLoaded', init);
 const runJSSlider = function () {
     const imagesSelector = '.gallery__item';
     const sliderRootSelector = '.js-slider';
-
     const imagesList = document.querySelectorAll(imagesSelector);
     const sliderRootElement = document.querySelector(sliderRootSelector);
 
@@ -26,9 +25,9 @@ const initEvents = function (imagesList, sliderRootElement) {
     imagesList.forEach(function (item) {
         item.addEventListener('click', function (e) {
             fireCustomEvent(e.currentTarget, 'js-slider-img-click');
-            fireCustomEvent(sliderRootElement, 'js-auto-slide');
+            const boundAutoSlide = onImageNext.bind(sliderRootElement);
+            autoSlideNext = setInterval(boundAutoSlide, 3000);
         });
-
     });
 
     // todo: 
@@ -82,10 +81,6 @@ const initCustomEvents = function (imagesList, sliderRootElement, imagesSelector
     sliderRootElement.addEventListener('js-slider-img-next', onImageNext);
     sliderRootElement.addEventListener('js-slider-img-prev', onImagePrev);
     sliderRootElement.addEventListener('js-slider-close', onClose);
-    sliderRootElement.addEventListener('js-auto-slide', function () {
-        const boundAutoSlide = onImageNext.bind(sliderRootElement);
-        autoSlideNext = setInterval(boundAutoSlide, 3000);
-    });
 }
 
 
